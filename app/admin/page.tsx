@@ -345,9 +345,44 @@ export default function AdminPage() {
                             )}
                             <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
                               {c.documentUrl && (
-                                <a href={c.documentUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.78rem", color: "#3b82f6", textDecoration: "none", background: "#eff6ff", padding: "4px 10px", borderRadius: 6, fontWeight: 600 }}>
+                                <button 
+                                  onClick={() => {
+                                    const url = c.documentUrl;
+                                    if (!url) return;
+                                    if (url.startsWith("data:")) {
+                                      try {
+                                        const parts = url.split(",");
+                                        const mime = parts[0].match(/:(.*?);/)?.[1] || "";
+                                        const bstr = atob(parts[1]);
+                                        let n = bstr.length;
+                                        const u8arr = new Uint8Array(n);
+                                        while (n--) {
+                                          u8arr[n] = bstr.charCodeAt(n);
+                                        }
+                                        const blob = new Blob([u8arr], { type: mime });
+                                        const blobUrl = URL.createObjectURL(blob);
+                                        window.open(blobUrl, "_blank");
+                                      } catch (e) {
+                                        window.open(url, "_blank");
+                                      }
+                                    } else {
+                                      window.open(url, "_blank");
+                                    }
+                                  }}
+                                  style={{ 
+                                    fontSize: "0.78rem", 
+                                    color: "#3b82f6", 
+                                    textDecoration: "none", 
+                                    background: "#eff6ff", 
+                                    padding: "4px 10px", 
+                                    borderRadius: 6, 
+                                    fontWeight: 600,
+                                    border: "none",
+                                    cursor: "pointer"
+                                  }}
+                                >
                                   📄 {c.documentName || "View Document"}
-                                </a>
+                                </button>
                               )}
                               <button onClick={() => toggleActive(c.id, c.isActive)} style={{ fontSize: "0.78rem", color: c.isActive ? "#d97706" : "#16a34a", background: c.isActive ? "#fef9c3" : "#dcfce7", border: "none", padding: "4px 10px", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}>
                                 {c.isActive ? "⏸ Deactivate" : "▶ Activate"}

@@ -514,9 +514,35 @@ function LiveCases() {
                     DONATE
                   </a>
                   {c.documentUrl ? (
-                    <a href={c.documentUrl} target="_blank" rel="noopener noreferrer" className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center" style={{ backgroundColor: "#E65A00", textDecoration: "none" }}>
+                    <button 
+                      onClick={() => {
+                        const url = c.documentUrl;
+                        if (!url) return;
+                        if (url.startsWith("data:")) {
+                          try {
+                            const parts = url.split(",");
+                            const mime = parts[0].match(/:(.*?);/)?.[1] || "";
+                            const bstr = atob(parts[1]);
+                            let n = bstr.length;
+                            const u8arr = new Uint8Array(n);
+                            while (n--) {
+                              u8arr[n] = bstr.charCodeAt(n);
+                            }
+                            const blob = new Blob([u8arr], { type: mime });
+                            const blobUrl = URL.createObjectURL(blob);
+                            window.open(blobUrl, "_blank");
+                          } catch (e) {
+                            window.open(url, "_blank");
+                          }
+                        } else {
+                          window.open(url, "_blank");
+                        }
+                      }}
+                      className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center cursor-pointer border-0" 
+                      style={{ backgroundColor: "#E65A00" }}
+                    >
                       DOCUMENTS
-                    </a>
+                    </button>
                   ) : (
                     <button disabled className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md" style={{ backgroundColor: "#E65A00", opacity: 0.5, cursor: "not-allowed" }}>
                       DOCUMENTS
