@@ -3,11 +3,35 @@ import crypto from "crypto";
 import path from "path";
 import fs from "fs/promises";
 import { getAdminConfig } from "../../../../lib/auth";
+import { getDbPool } from "../../../../lib/db";
 
 const DATA_PATH = path.join(process.cwd(), "data", "donations.json");
 
 async function writeDonation(donation: any) {
   try {
+    const pool = await getDbPool();
+    if (pool) {
+      await pool.query(
+        `INSERT INTO donations (id, paymentId, orderId, name, email, phone, pan, message, amount, cause, createdAt) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          donation.id,
+          donation.paymentId || "",
+          donation.orderId || "",
+          donation.name || "",
+          donation.email || "",
+          donation.phone || "",
+          donation.pan || "",
+          donation.message || "",
+          donation.amount || 0,
+          donation.cause || "",
+          donation.createdAt
+        ]
+      );
+      console.log("Donation saved to Hostinger MySQL successfully.");
+      return;
+    }
+
     await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
     let existing = [];
     try {

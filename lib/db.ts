@@ -49,6 +49,23 @@ export async function getDbPool(): Promise<mysql.Pool | null> {
       // Defensive schema migration: upgrade TEXT to LONGTEXT to support large Base64 uploads
       await connection.query("ALTER TABLE cases MODIFY imageUrl LONGTEXT");
       await connection.query("ALTER TABLE cases MODIFY documentUrl LONGTEXT");
+      
+      // Auto-create donations table
+      await connection.query(`
+        CREATE TABLE IF NOT EXISTS donations (
+          id VARCHAR(255) PRIMARY KEY,
+          paymentId VARCHAR(255) DEFAULT '',
+          orderId VARCHAR(255) DEFAULT '',
+          name VARCHAR(255) DEFAULT '',
+          email VARCHAR(255) DEFAULT '',
+          phone VARCHAR(255) DEFAULT '',
+          pan VARCHAR(255) DEFAULT '',
+          message TEXT,
+          amount DOUBLE DEFAULT 0,
+          cause VARCHAR(255) DEFAULT '',
+          createdAt VARCHAR(255)
+        )
+      `);
       connection.release();
       initialized = true;
       console.log("Database initialized successfully: 'cases' table synced.");

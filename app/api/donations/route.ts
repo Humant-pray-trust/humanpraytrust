@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
 import { checkAdminPassword } from "../../../lib/auth";
+import { getDbPool } from "../../../lib/db";
 
 const DATA_PATH = path.join(process.cwd(), "data", "donations.json");
 
@@ -22,9 +23,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const pool = await getDbPool();
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM donations ORDER BY createdAt DESC");
+      return NextResponse.json(rows);
+    }
+
     const donations = await readDonations();
     return NextResponse.json(donations);
-  } catch {
+  } catch (err) {
+    console.error("GET donations error:", err);
     return NextResponse.json({ error: "Failed to load donations" }, { status: 500 });
   }
 }
