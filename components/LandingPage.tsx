@@ -8,7 +8,7 @@ import {
   PawPrint, Bird, Activity, BookOpen,
   Droplets, MapPin, Mail, Phone, ArrowRight,
   Stethoscope, Home as HomeIcon, Leaf,
-  Check, HeartHandshake, Lock
+  Check, HeartHandshake, Lock, Menu, X
 } from "lucide-react";
 
 /* ─── Theme ─────────────────────────────────────────────── */
@@ -103,6 +103,8 @@ const DoodleCircle = ({ className }: { className?: string }) => (
 /* ─── Navigation ────────────────────────────────────────── */
 function Navigation() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", fn);
@@ -120,8 +122,8 @@ function Navigation() {
         scrolled ? "bg-white/80 backdrop-blur-md shadow-sm py-4" : "bg-transparent py-6"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-        <a href="#home" className="flex items-center gap-3">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between relative">
+        <a href="#home" className="flex items-center gap-3 z-50">
           <img 
             src="/website/human%20trust%20logo.jpg.jpeg" 
             alt="Human Pray Trust Logo" 
@@ -145,15 +147,52 @@ function Navigation() {
             </Link>
           ))}
         </div>
+        
+        {/* Mobile menu button */}
+        <div className="lg:hidden flex items-center z-50">
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={`p-2 transition-colors ${scrolled || mobileMenuOpen ? "text-gray-800" : "text-white"}`}
+            aria-label="Toggle Menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
 
-        <a
-          href="/donate"
-          style={{ backgroundColor: C.saffron }}
-          className="text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity inline-block"
-        >
-          Donate Now
-        </a>
+        <div className="hidden lg:block">
+          <a
+            href="/donate"
+            style={{ backgroundColor: C.saffron }}
+            className="text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity inline-block"
+          >
+            Donate Now
+          </a>
+        </div>
       </div>
+      
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden absolute top-0 left-0 w-full bg-white shadow-xl flex flex-col pt-24 pb-6 px-6 gap-4 border-b border-gray-100">
+          {navItems.map((item) => (
+            <Link
+              key={item}
+              href={item === "About" ? "/about" : (item === "Live Cases" ? "/live-cases" : (item === "Gallery" ? "/gallery" : `/#${item.toLowerCase().replace(" ", "-")}`))}
+              className="text-gray-800 font-medium hover:text-[#FF6B00] py-2 border-b border-gray-50 last:border-0"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {item}
+            </Link>
+          ))}
+          <a
+            href="/donate"
+            style={{ backgroundColor: C.saffron }}
+            className="text-white px-6 py-3 rounded-full text-sm font-semibold text-center mt-2"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Donate Now
+          </a>
+        </div>
+      )}
     </motion.nav>
   );
 }
@@ -450,24 +489,9 @@ function ActionCards() {
 
 /* ─── Live Cases ────────────────────────────────────────── */
 function LiveCases() {
-  const [cases, setCases] = useState<any[]>([
-    {
-      title: "Satyam Kumar",
-      description: "7-year-old Satyam is bravely fighting a life-threatening heart condition — a hole in his heart that needs urgent surgery. We humbly request your support to help give him a chance at a healthy, happy life.",
-      imageUrl: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.20.58.jpeg"
-    },
-    {
-      title: "Tanush Bera",
-      description: "Tanush Bera, just 6.5 years old, is bravely battling blood cancer (Acute Promyelocytic Leukemia) and urgently needs treatment. Your support can give him a fighting chance to survive and recover.",
-      imageUrl: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.20.59.jpeg"
-    },
-    {
-      title: "Varsha",
-      description: "Varsha, just 2 years old, is courageously battling an eye tumor at such a tender age. Her condition requires urgent medical treatment to prevent further complications and protect her vision and life.",
-      imageUrl: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.21.00.jpeg"
-    }
-  ]);
+  const [cases, setCases] = useState<any[]>([]);
   const [expandedCases, setExpandedCases] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleCase = (index: number) => {
     setExpandedCases(prev => 
@@ -481,12 +505,11 @@ function LiveCases() {
       .then(data => {
         if (Array.isArray(data)) {
           const active = data.filter((c: any) => c.isActive).reverse().slice(0, 3);
-          if (active.length > 0) {
-            setCases(active);
-          }
+          setCases(active);
         }
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -501,83 +524,93 @@ function LiveCases() {
           </h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {cases.map((c, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 flex flex-col transition-transform duration-300 hover:-translate-y-2">
-              <div className="relative h-64 overflow-hidden group bg-gray-50 flex items-center justify-center">
-                <motion.img 
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
-                  src={c.imageUrl} 
-                  alt={c.title} 
-                  className="w-full h-full object-contain p-2" 
-                />
-                <div className="absolute bottom-4 left-4 px-4 py-1.5 rounded-full text-white font-semibold text-xs tracking-wide backdrop-blur-md bg-teal-600/90 shadow-sm border border-teal-400/50">
-                  Live Case
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-[#FF6B00] rounded-full animate-spin"></div>
+          </div>
+        ) : cases.length === 0 ? (
+          <div className="text-center py-20 bg-gray-50 rounded-3xl border border-gray-100">
+            <p className="text-xl text-gray-500">No active cases found at this moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {cases.map((c, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 flex flex-col transition-transform duration-300 hover:-translate-y-2">
+                <div className="relative h-64 overflow-hidden group bg-gray-50 flex items-center justify-center border-b border-gray-100">
+                  <motion.img 
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
+                    src={c.imageUrl} 
+                    alt={c.title} 
+                    className="w-full h-full object-contain p-2" 
+                  />
+                  <div className="absolute bottom-4 left-4 px-4 py-1.5 rounded-full text-white font-semibold text-xs tracking-wide backdrop-blur-md bg-teal-600/90 shadow-sm border border-teal-400/50">
+                    Live Case
+                  </div>
                 </div>
-              </div>
-              <div className="p-8 flex flex-col flex-1">
-                <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{c.title}</h3>
-                <div className="flex-1 mb-8">
-                  <p 
-                    className="text-gray-500 text-sm leading-relaxed transition-all duration-300" 
-                    style={expandedCases.includes(i) ? undefined : { display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
-                  >
-                    {c.description}
-                  </p>
-                  {c.description && c.description.length > 120 && (
-                    <button 
-                      onClick={() => toggleCase(i)}
-                      className="mt-3 text-[#FF6B00] text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity"
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{c.title}</h3>
+                  <div className="flex-1 mb-8">
+                    <p 
+                      className="text-gray-500 text-sm leading-relaxed transition-all duration-300" 
+                      style={expandedCases.includes(i) ? undefined : { display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                     >
-                      {expandedCases.includes(i) ? "Read Less" : "Read More"}
-                    </button>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3 mt-auto">
-                  <a href={`/donate?case=${encodeURIComponent(c.title)}`} className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center" style={{ backgroundColor: "#E65A00", textDecoration: "none" }}>
-                    DONATE
-                  </a>
-                  {c.documentUrl ? (
-                    <button 
-                      onClick={() => {
-                        const url = c.documentUrl;
-                        if (!url) return;
-                        if (url.startsWith("data:")) {
-                          try {
-                            const parts = url.split(",");
-                            const mime = parts[0].match(/:(.*?);/)?.[1] || "";
-                            const bstr = atob(parts[1]);
-                            let n = bstr.length;
-                            const u8arr = new Uint8Array(n);
-                            while (n--) {
-                              u8arr[n] = bstr.charCodeAt(n);
+                      {c.description}
+                    </p>
+                    {c.description && c.description.length > 120 && (
+                      <button 
+                        onClick={() => toggleCase(i)}
+                        className="mt-3 text-[#FF6B00] text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity"
+                      >
+                        {expandedCases.includes(i) ? "Read Less" : "Read More"}
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mt-auto">
+                    <a href={`/donate?case=${encodeURIComponent(c.title)}`} className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center" style={{ backgroundColor: "#E65A00", textDecoration: "none" }}>
+                      DONATE
+                    </a>
+                    {c.documentUrl ? (
+                      <button 
+                        onClick={() => {
+                          const url = c.documentUrl;
+                          if (!url) return;
+                          if (url.startsWith("data:")) {
+                            try {
+                              const parts = url.split(",");
+                              const mime = parts[0].match(/:(.*?);/)?.[1] || "";
+                              const bstr = atob(parts[1]);
+                              let n = bstr.length;
+                              const u8arr = new Uint8Array(n);
+                              while (n--) {
+                                u8arr[n] = bstr.charCodeAt(n);
+                              }
+                              const blob = new Blob([u8arr], { type: mime });
+                              const blobUrl = URL.createObjectURL(blob);
+                              window.open(blobUrl, "_blank");
+                            } catch (e) {
+                              window.open(url, "_blank");
                             }
-                            const blob = new Blob([u8arr], { type: mime });
-                            const blobUrl = URL.createObjectURL(blob);
-                            window.open(blobUrl, "_blank");
-                          } catch (e) {
+                          } else {
                             window.open(url, "_blank");
                           }
-                        } else {
-                          window.open(url, "_blank");
-                        }
-                      }}
-                      className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center cursor-pointer border-0" 
-                      style={{ backgroundColor: "#E65A00" }}
-                    >
-                      DOCUMENTS
-                    </button>
-                  ) : (
-                    <button disabled className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md" style={{ backgroundColor: "#E65A00", opacity: 0.5, cursor: "not-allowed" }}>
-                      DOCUMENTS
-                    </button>
-                  )}
+                        }}
+                        className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center cursor-pointer border-0" 
+                        style={{ backgroundColor: "#E65A00" }}
+                      >
+                        DOCUMENTS
+                      </button>
+                    ) : (
+                      <button disabled className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md" style={{ backgroundColor: "#E65A00", opacity: 0.5, cursor: "not-allowed" }}>
+                        DOCUMENTS
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <div className="mt-16 flex justify-center">
           <Link 
