@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import {
   ChevronDown, Heart, Search, Gift, Users,
@@ -135,13 +136,13 @@ function Navigation() {
 
         <div className="hidden lg:flex items-center space-x-8 text-sm font-medium">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item}
-              href={`#${item.toLowerCase().replace(" ", "-")}`}
+              href={item === "About" ? "/about" : (item === "Live Cases" ? "/live-cases" : (item === "Gallery" ? "/gallery" : `/#${item.toLowerCase().replace(" ", "-")}`))}
               className={`transition-colors ${scrolled ? "text-gray-800 hover:text-black" : "text-white/90 hover:text-white"}`}
             >
               {item}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -322,9 +323,13 @@ function AboutUs() {
               </div>
             </div>
 
-            <button className="px-8 py-4 rounded-full text-white font-bold tracking-widest hover:scale-105 transition-transform shadow-lg" style={{ backgroundColor: C.charcoal }}>
+            <Link 
+              href="/about"
+              className="inline-block px-8 py-4 rounded-full text-white font-bold tracking-widest hover:scale-105 transition-transform shadow-lg" 
+              style={{ backgroundColor: C.charcoal }}
+            >
               READ OUR FULL STORY
-            </button>
+            </Link>
           </motion.div>
         </div>
       </div>
@@ -462,6 +467,13 @@ function LiveCases() {
       imageUrl: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.21.00.jpeg"
     }
   ]);
+  const [expandedCases, setExpandedCases] = useState<number[]>([]);
+
+  const toggleCase = (index: number) => {
+    setExpandedCases(prev => 
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    );
+  };
 
   useEffect(() => {
     fetch("/api/cases")
@@ -492,13 +504,13 @@ function LiveCases() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {cases.map((c, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 flex flex-col transition-transform duration-300 hover:-translate-y-2">
-              <div className="relative h-64 overflow-hidden group">
+              <div className="relative h-64 overflow-hidden group bg-gray-50 flex items-center justify-center">
                 <motion.img 
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.5 }}
                   src={c.imageUrl} 
                   alt={c.title} 
-                  className="w-full h-full object-cover" 
+                  className="w-full h-full object-contain p-2" 
                 />
                 <div className="absolute bottom-4 left-4 px-4 py-1.5 rounded-full text-white font-semibold text-xs tracking-wide backdrop-blur-md bg-teal-600/90 shadow-sm border border-teal-400/50">
                   Live Case
@@ -506,9 +518,22 @@ function LiveCases() {
               </div>
               <div className="p-8 flex flex-col flex-1">
                 <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{c.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed flex-1 mb-8" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {c.description}
-                </p>
+                <div className="flex-1 mb-8">
+                  <p 
+                    className="text-gray-500 text-sm leading-relaxed transition-all duration-300" 
+                    style={expandedCases.includes(i) ? undefined : { display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+                  >
+                    {c.description}
+                  </p>
+                  {c.description && c.description.length > 120 && (
+                    <button 
+                      onClick={() => toggleCase(i)}
+                      className="mt-3 text-[#FF6B00] text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity"
+                    >
+                      {expandedCases.includes(i) ? "Read Less" : "Read More"}
+                    </button>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-3 mt-auto">
                   <a href={`/donate?case=${encodeURIComponent(c.title)}`} className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center" style={{ backgroundColor: "#E65A00", textDecoration: "none" }}>
                     DONATE
@@ -552,6 +577,16 @@ function LiveCases() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        <div className="mt-16 flex justify-center">
+          <Link 
+            href="/live-cases" 
+            className="px-10 py-4 border-2 rounded-full font-bold tracking-widest text-sm hover:bg-gray-50 transition-colors uppercase" 
+            style={{ borderColor: C.charcoal, color: C.charcoal }}
+          >
+            VIEW ALL LIVE CASES
+          </Link>
         </div>
       </div>
     </section>
@@ -884,15 +919,20 @@ function Testimonials() {
 
 /* ─── Gallery ───────────────────────────────────────────── */
 function Gallery() {
-  const images = [
-    { src: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.20.58.jpeg", aspect: "aspect-[4/3]" },
-    { src: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.20.59.jpeg", aspect: "aspect-[3/4]" },
-    { src: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.21.00.jpeg", aspect: "aspect-square" },
-    { src: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.21.14.jpeg", aspect: "aspect-[16/9]" },
-    { src: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.21.15.jpeg", aspect: "aspect-square" },
-    { src: "/NGO%20IMAGES/WhatsApp%20Image%202026-05-12%20at%2015.22.54.jpeg", aspect: "aspect-[3/4]" },
-    { src: "/NGO%20IMAGES/dog.jpeg", aspect: "aspect-[4/3]" },
-  ];
+  const [images, setImages] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/gallery")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setImages(data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const visibleImages = images.slice(0, 3);
 
   return (
     <section id="gallery" className="py-24 bg-white">
@@ -902,14 +942,14 @@ function Gallery() {
       </div>
       <div className="max-w-[1600px] mx-auto px-4">
         <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
-          {images.map((img, i) => (
+          {visibleImages.map((img, i) => (
             <motion.div 
-              key={i} 
-              initial={{ opacity: 0, y: 60, scale: 0.9 }} 
+              key={img.id || i} 
+              initial={{ opacity: 0, y: 40, scale: 0.95 }} 
               whileInView={{ opacity: 1, y: 0, scale: 1 }} 
               viewport={{ once: true, margin: "-50px" }} 
-              transition={{ delay: (i % 3) * 0.15, duration: 0.8, ease: "easeOut" }} 
-              className={`w-full ${img.aspect} rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden relative group shadow-md hover:shadow-2xl transition-shadow duration-500`}
+              transition={{ duration: 0.6, ease: "easeOut" }} 
+              className={`w-full ${img.aspect || "aspect-square"} rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden relative group shadow-md hover:shadow-2xl transition-shadow duration-500`}
             >
               <motion.img
                 src={img.src}
@@ -922,6 +962,18 @@ function Gallery() {
             </motion.div>
           ))}
         </div>
+
+        {images.length > 0 && (
+          <div className="mt-16 flex justify-center">
+            <Link 
+              href="/gallery" 
+              className="px-10 py-4 border-2 rounded-full font-bold tracking-widest text-sm hover:bg-gray-50 transition-colors uppercase" 
+              style={{ borderColor: C.charcoal, color: C.charcoal }}
+            >
+              VIEW FULL GALLERY
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

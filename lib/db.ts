@@ -66,9 +66,19 @@ export async function getDbPool(): Promise<mysql.Pool | null> {
           createdAt VARCHAR(255)
         )
       `);
+
+      // Auto-create gallery table
+      await connection.query(`
+        CREATE TABLE IF NOT EXISTS gallery (
+          id VARCHAR(255) PRIMARY KEY,
+          src LONGTEXT,
+          aspect VARCHAR(50) DEFAULT 'aspect-square',
+          createdAt VARCHAR(255)
+        )
+      `);
       connection.release();
       initialized = true;
-      console.log("Database initialized successfully: 'cases' table synced.");
+      console.log("Database initialized successfully: tables synced.");
     } catch (err) {
       console.error("Database connection / initialization failed:", err);
     }

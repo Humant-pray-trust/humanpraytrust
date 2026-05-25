@@ -1,5 +1,11 @@
 {
-  "/page": "app/page.js",
+  "/donate/page": "app/donate/page.js",
+  "/live-cases/page": "app/live-cases/page.js",
+  "/gallery/page": "app/gallery/page.js",
   "/admin/page": "app/admin/page.js",
-  "/donate/page": "app/donate/page.js"
+  "/api/gallery/route": "app/api/gallery/route.js",
+  "/page": "app/page.js",
+  "/api/cases/route": "app/api/cases/route.js",
+  "/api/gallery/[id]/route": "app/api/gallery/[id]/route.js",
+  "/api/donations/route": "app/api/donations/route.js"
 }
