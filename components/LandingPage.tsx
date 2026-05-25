@@ -1054,7 +1054,7 @@ function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900">Visit Us</h4>
-                  <p className="text-gray-600">123 Hope Street, New Delhi, India</p>
+                  <p className="text-gray-600">Noida sector 60, Uttar Pradesh</p>
                 </div>
               </div>
             </div>
@@ -1151,7 +1151,7 @@ function Footer() {
           <div>
             <h4 className="font-semibold text-sm uppercase tracking-wider mb-6" style={{ color: C.charcoal }}>Contact</h4>
             <ul className="space-y-4 text-gray-500">
-              <li className="flex items-center gap-3"><MapPin className="w-4 h-4 shrink-0" /> New Delhi, India</li>
+              <li className="flex items-center gap-3"><MapPin className="w-4 h-4 shrink-0" /> Noida sector 60, Uttar Pradesh</li>
               <li className="flex items-center gap-3"><Mail className="w-4 h-4 shrink-0" /> contact@humanpraytrust.org</li>
               <li className="flex items-center gap-3"><Phone className="w-4 h-4 shrink-0" /> +91 85108 04149</li>
             </ul>

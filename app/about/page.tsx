@@ -93,7 +93,7 @@ export default function AboutPage() {
                 <p className="text-gray-500 mt-2">Transparent and verified</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <div className="flex flex-col">
                   <h3 className="text-center font-bold text-gray-600 mb-4 uppercase tracking-widest text-sm">Official Certification</h3>
                   <div className="rounded-2xl overflow-hidden shadow-2xl border-4 bg-white p-1.5 hover:-translate-y-2 transition-transform duration-300" style={{ borderColor: C.green }}>
@@ -124,6 +124,29 @@ export default function AboutPage() {
                       <img 
                         src="/NGO%20IMAGES/documentz/photo_2026-05-25_15-54-43%20(2).jpg" 
                         alt="PAN Document" 
+                        className="w-full h-auto object-cover"
+                      />
+                      {/* Watermark Overlay */}
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none">
+                        <div className="w-[150%] transform -rotate-[25deg] border-y-2 border-red-500/50 bg-white/10 backdrop-blur-[1px] py-2 flex flex-col items-center justify-center shadow-sm">
+                          <span className="text-red-600/80 font-extrabold text-xl md:text-2xl uppercase tracking-[0.15em] whitespace-nowrap drop-shadow-md">
+                            Not For Official Purpose
+                          </span>
+                          <span className="text-red-600/80 font-bold text-sm md:text-base tracking-wider whitespace-nowrap mt-1 drop-shadow-md">
+                            Crossed to prevent misuse
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <h3 className="text-center font-bold text-gray-600 mb-4 uppercase tracking-widest text-sm">Additional Document</h3>
+                  <div className="rounded-2xl overflow-hidden shadow-2xl border-4 bg-white p-1.5 hover:-translate-y-2 transition-transform duration-300" style={{ borderColor: C.saffron }}>
+                    <div className="relative rounded-xl overflow-hidden">
+                      <img 
+                        src="/NGO%20IMAGES/documentz/photo_2026-05-25_22-59-42.jpg" 
+                        alt="Additional Document" 
                         className="w-full h-auto object-cover"
                       />
                       {/* Watermark Overlay */}
