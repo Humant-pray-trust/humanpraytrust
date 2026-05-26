@@ -41,9 +41,9 @@ export default function AboutPage() {
               className="h-10 w-10 object-cover rounded-full shadow-sm border border-gray-200"
             />
             <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700 }} className="hidden sm:block">
-              <span style={{ color: C.saffron }}>human</span>{" "}
-              <span style={{ color: C.black }}>pray</span>{" "}
-              <span style={{ color: C.green }}>trust</span>
+              <span style={{ color: C.saffron }}>HUMAN</span>{" "}
+              <span style={{ color: C.black }}>PRAY</span>{" "}
+              <span style={{ color: C.green }}>TRUST</span>
             </div>
           </div>
         </div>

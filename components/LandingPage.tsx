@@ -8,7 +8,7 @@ import {
   PawPrint, Bird, Activity, BookOpen,
   Droplets, MapPin, Mail, Phone, ArrowRight,
   Stethoscope, Home as HomeIcon, Leaf,
-  Check, HeartHandshake, Lock, Menu, X
+  Check, HeartHandshake, Lock, Menu, X, Award
 } from "lucide-react";
 
 /* ─── Theme ─────────────────────────────────────────────── */
@@ -111,7 +111,7 @@ function Navigation() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const navItems = ["Home", "About", "Our Work", "Live Cases", "Gallery", "Contact"];
+  const navItems = ["Home", "About", "Our Work", "Live Cases", "Successful Stories", "Gallery", "Contact"];
 
   return (
     <motion.nav
@@ -130,9 +130,9 @@ function Navigation() {
             className={`transition-all duration-300 object-cover rounded-full shadow-md ${scrolled ? "h-11 w-11 border border-gray-200" : "h-14 w-14 border-2 border-white/20"}`}
           />
           <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.35rem", fontWeight: 700 }} className="hidden sm:block transition-colors duration-300">
-            <span style={{ color: C.saffron }}>human</span>{" "}
-            <span style={{ color: scrolled ? C.black : C.white }}>pray</span>{" "}
-            <span style={{ color: C.green }}>trust</span>
+            <span style={{ color: C.saffron }}>HUMAN</span>{" "}
+            <span style={{ color: scrolled ? C.black : C.white }}>PRAY</span>{" "}
+            <span style={{ color: C.green }}>TRUST</span>
           </div>
         </a>
 
@@ -257,7 +257,7 @@ function Hero() {
           <div className="w-full max-w-lg lg:max-w-xl pt-20 xl:-ml-8">
             <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="flex items-center gap-3 mb-6">
               <div className="h-px w-10" style={{ backgroundColor: C.saffron }} />
-              <span className="text-xs tracking-[0.25em] uppercase" style={{ color: C.saffron }}>Since 2015 · India</span>
+              <span className="text-xs tracking-[0.25em] uppercase" style={{ color: C.saffron }}>Since 2025 · India</span>
             </motion.div>
 
             <motion.h1
@@ -416,6 +416,7 @@ function ActionCards() {
         "Build Connections and Community."
       ],
       color: "#007A5E", // Rich green
+      whatsappUrl: `https://wa.me/918510804149?text=${encodeURIComponent("Hi HUMAN PRAY TRUST! I'm interested in becoming a volunteer and making a meaningful impact in my community. Please share more details on how I can join your mission.")}`,
     },
     {
       title: "Send a gift for\nchildrens",
@@ -427,6 +428,7 @@ function ActionCards() {
         "Share Smiles with Children's Presents."
       ],
       color: "#00B4D8", // Cyan blue
+      whatsappUrl: `https://wa.me/918510804149?text=${encodeURIComponent("Hi HUMAN PRAY TRUST! I would love to send a gift for the children and spread joy. Please let me know how I can send or sponsor gifts for kids.")}`,
     }
   ];
 
@@ -435,51 +437,58 @@ function ActionCards() {
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
           {cards.map((card, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: i * 0.2, duration: 0.8 }}
-              className="relative overflow-hidden rounded-3xl p-10 lg:p-12 text-white shadow-xl hover:shadow-2xl transition-shadow duration-300"
-              style={{ backgroundColor: "#25312E" }}
+            <a 
+              key={i} 
+              href={card.whatsappUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="block no-underline select-none cursor-pointer group/card"
             >
-              {/* Organic blobs to mimic the brush strokes at bottom right */}
-              <div className="absolute -bottom-10 -right-10 w-64 h-64" style={{ backgroundColor: card.color, borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%", transform: "rotate(-15deg)" }} />
-              <div className="absolute -bottom-24 -right-4 w-80 h-80" style={{ backgroundColor: card.color, borderRadius: "60% 40% 30% 70% / 50% 40% 60% 50%", transform: "rotate(25deg)", opacity: 0.8 }} />
-              <div className="absolute -bottom-16 right-20 w-48 h-48" style={{ backgroundColor: card.color, borderRadius: "40% 60% 50% 50% / 40% 50% 50% 60%", transform: "rotate(60deg)", opacity: 0.9 }} />
-              
-              {/* Content */}
-              <div className="relative z-10">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-10">
-                  <div className="w-24 h-24 rounded-full flex items-center justify-center shrink-0 border-4 border-[#25312E]" style={{ backgroundColor: card.color }}>
-                    <card.icon className="w-12 h-12 text-white" strokeWidth={1.5} />
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: i * 0.2, duration: 0.8 }}
+                className="relative overflow-hidden rounded-3xl p-10 lg:p-12 text-white shadow-xl hover:shadow-2xl transition-all duration-300"
+                style={{ backgroundColor: "#25312E" }}
+              >
+                {/* Organic blobs to mimic the brush strokes at bottom right */}
+                <div className="absolute -bottom-10 -right-10 w-64 h-64 transition-transform duration-500 group-hover/card:scale-105" style={{ backgroundColor: card.color, borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%", transform: "rotate(-15deg)" }} />
+                <div className="absolute -bottom-24 -right-4 w-80 h-80 transition-transform duration-500 group-hover/card:scale-105" style={{ backgroundColor: card.color, borderRadius: "60% 40% 30% 70% / 50% 40% 60% 50%", transform: "rotate(25deg)", opacity: 0.8 }} />
+                <div className="absolute -bottom-16 right-20 w-48 h-48 transition-transform duration-500 group-hover/card:scale-105" style={{ backgroundColor: card.color, borderRadius: "40% 60% 50% 50% / 40% 50% 50% 60%", transform: "rotate(60deg)", opacity: 0.9 }} />
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-10">
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center shrink-0 border-4 border-[#25312E]" style={{ backgroundColor: card.color }}>
+                      <card.icon className="w-12 h-12 text-white" strokeWidth={1.5} />
+                    </div>
+                    <h3 className="text-3xl lg:text-4xl font-bold leading-tight whitespace-pre-line tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                      {card.title}
+                    </h3>
                   </div>
-                  <h3 className="text-3xl lg:text-4xl font-bold leading-tight whitespace-pre-line tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                    {card.title}
-                  </h3>
+
+                  <p className="text-xl text-gray-300 mb-10" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", letterSpacing: "0.5px" }}>
+                    {card.desc}
+                  </p>
+
+                  <ul className="space-y-4 mb-12">
+                    {card.bullets.map((bullet, j) => (
+                      <li key={j} className="flex items-center gap-4">
+                        <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
+                          <Check className="w-3.5 h-3.5" style={{ color: "#25312E" }} strokeWidth={4} />
+                        </div>
+                        <span className="font-medium text-[1.05rem] text-gray-100">{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button className="bg-white text-black px-10 py-4 rounded-full font-bold text-sm hover:scale-105 transition-transform tracking-widest shadow-md">
+                    VIEW DETAILS
+                  </button>
                 </div>
-
-                <p className="text-xl text-gray-300 mb-10" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", letterSpacing: "0.5px" }}>
-                  {card.desc}
-                </p>
-
-                <ul className="space-y-4 mb-12">
-                  {card.bullets.map((bullet, j) => (
-                    <li key={j} className="flex items-center gap-4">
-                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
-                        <Check className="w-3.5 h-3.5" style={{ color: "#25312E" }} strokeWidth={4} />
-                      </div>
-                      <span className="font-medium text-[1.05rem] text-gray-100">{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button className="bg-white text-black px-10 py-4 rounded-full font-bold text-sm hover:scale-105 transition-transform tracking-widest shadow-md">
-                  VIEW DETAILS
-                </button>
-              </div>
-            </motion.div>
+              </motion.div>
+            </a>
           ))}
         </div>
       </div>
@@ -734,10 +743,10 @@ function AnimalWelfare() {
 /* ─── Initiatives Grid ──────────────────────────────────── */
 function InitiativesGrid() {
   const items = [
-    { emoji: "🌾", title: "Food Distribution", desc: "Providing nutritious meals to communities facing hunger.", span: "col-span-1 md:col-span-2 row-span-2", bg: "bg-gradient-to-br from-[#FF6B00] to-[#E65A00]" },
-    { emoji: "🩺", title: "Medical Aid", desc: "Delivering crucial healthcare services and supplies.", span: "col-span-1 md:col-span-2 row-span-1", bg: "bg-gradient-to-br from-[#2D6A4F] to-[#1B4332]" },
-    { emoji: "🚰", title: "Clean Water Access", desc: "Building sustainable pure water sources.", span: "col-span-1 row-span-1", bg: "bg-gradient-to-br from-blue-600 to-blue-800" },
-    { emoji: "👩🏽‍🏫", title: "Women Empowerment", desc: "Skills & education for independence.", span: "col-span-1 row-span-1", bg: "bg-gradient-to-br from-purple-600 to-purple-800" },
+    { emoji: "🌾", title: "Food Distribution", desc: "Providing nutritious meals to communities facing hunger.", span: "col-span-1 md:col-span-2 row-span-2", bg: "bg-gradient-to-br from-[#FF6B00] to-[#E65A00]", href: "/donate?case=Food%20Distribution" },
+    { emoji: "🐕", title: "Dog Feeding", desc: "Nourishing street dogs daily with freshly prepared meals.", span: "col-span-1 md:col-span-2 row-span-1", bg: "bg-gradient-to-br from-[#2D6A4F] to-[#1B4332]", href: "/donate?case=Dog%20Feeding" },
+    { emoji: "🚰", title: "Clean Water", desc: "Building sustainable pure water sources.", span: "col-span-1 row-span-1", bg: "bg-gradient-to-br from-blue-600 to-blue-800", href: "/donate?case=Clean%20Water%20Access" },
+    { emoji: "🎂", title: "Celebration", desc: "Sponsoring beautiful birthdays and special days for underprivileged kids.", span: "col-span-1 row-span-1", bg: "bg-gradient-to-br from-purple-600 to-purple-800", href: "/donate?case=Special%20Day%20Mission" },
   ];
   return (
     <section id="our-work" className="py-32" style={{ backgroundColor: C.charcoal }}>
@@ -748,18 +757,20 @@ function InitiativesGrid() {
         </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-4 auto-rows-[220px] gap-6">
           {items.map((item, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className={`${item.span} relative group overflow-hidden rounded-[2rem] ${item.bg} shadow-2xl`}>
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500 z-10" />
-              {/* Giant Emoji Background */}
-              <div className="absolute -bottom-10 -right-6 text-[150px] opacity-20 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700 z-0 pointer-events-none" style={{ filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.5))' }}>
-                {item.emoji}
-              </div>
-              <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end z-20">
-                <div className="text-5xl mb-6 transform group-hover:-translate-y-2 transition-transform duration-500">{item.emoji}</div>
-                <h3 className="text-3xl text-white mb-3 font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
-                <p className="text-white/90 font-medium text-sm md:text-base leading-relaxed max-w-[80%]">{item.desc}</p>
-              </div>
-            </motion.div>
+            <Link href={item.href} key={i} className={`${item.span} block`}>
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className={`h-full relative group overflow-hidden rounded-[2rem] ${item.bg} shadow-2xl cursor-pointer`}>
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+                {/* Giant Emoji Background */}
+                <div className="absolute -bottom-10 -right-6 text-[150px] opacity-20 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700 z-0 pointer-events-none" style={{ filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.5))' }}>
+                  {item.emoji}
+                </div>
+                <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end z-20">
+                  <div className="text-5xl mb-6 transform group-hover:-translate-y-2 transition-transform duration-500">{item.emoji}</div>
+                  <h3 className="text-3xl text-white mb-3 font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
+                  <p className="text-white/90 font-medium text-sm md:text-base leading-relaxed max-w-[80%]">{item.desc}</p>
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>
@@ -771,6 +782,33 @@ function InitiativesGrid() {
 function DonateSection() {
   const amounts = [500, 1500, 5000];
   const [selectedAmount, setSelectedAmount] = useState<number | 'custom'>(1500);
+  const [customVal, setCustomVal] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [pan, setPan] = useState("");
+  const [showAlternative, setShowAlternative] = useState(false);
+  const [altTab, setAltTab] = useState<"qr" | "bank">("qr");
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, fieldName: string) => {
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(fieldName);
+      setTimeout(() => setCopiedField(null), 2000);
+    }
+  };
+
+  const finalVal = selectedAmount === 'custom' ? parseInt(customVal || "0") : selectedAmount;
+
+  const handleDonateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (finalVal < 10) {
+      alert("Please enter a valid donation amount (minimum ₹10).");
+      return;
+    }
+    // Redirect to full secure donate page with preset states
+    window.location.href = `/donate?amount=${finalVal}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&pan=${encodeURIComponent(pan)}`;
+  };
 
   return (
     <section id="donate" className="py-32 relative overflow-hidden bg-white">
@@ -826,58 +864,216 @@ function DonateSection() {
 
           {/* Right Content: Donation Widget */}
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-gray-100 relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FF6B00]/10 to-transparent rounded-bl-[100px] rounded-tr-[2.5rem]" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FF6B00]/10 to-transparent rounded-bl-[100px] rounded-tr-[2.5rem] pointer-events-none" />
             
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Choose Amount</h3>
-            <p className="text-gray-500 mb-8">Select or enter an amount to donate securely</p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              {amounts.map((amt) => (
-                <button
-                  key={amt}
-                  onClick={() => setSelectedAmount(amt)}
-                  className={`py-4 rounded-2xl font-bold text-lg border-2 transition-all ${selectedAmount === amt ? 'border-[#FF6B00] bg-[#FF6B00]/5 text-[#FF6B00]' : 'border-gray-100 hover:border-gray-300 text-gray-700'}`}
-                >
-                  ₹{amt}
-                </button>
-              ))}
-              <button
-                onClick={() => setSelectedAmount('custom')}
-                className={`py-4 rounded-2xl font-bold text-lg border-2 transition-all ${selectedAmount === 'custom' ? 'border-[#FF6B00] bg-[#FF6B00]/5 text-[#FF6B00]' : 'border-gray-100 hover:border-gray-300 text-gray-700'}`}
-              >
-                Other
-              </button>
-            </div>
-            
-            {selectedAmount === 'custom' && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6">
-                <div className="relative">
-                  <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 text-xl font-bold">₹</span>
-                  <input type="number" placeholder="Enter amount" className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 border-2 border-gray-100 focus:outline-none focus:border-[#FF6B00] text-xl font-bold transition-colors" />
+            {showAlternative ? (
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-gray-900">Alternative Payment</h3>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowAlternative(false)}
+                    className="text-xs font-bold hover:underline"
+                    style={{ color: C.saffron }}
+                  >
+                    ← Back to Card
+                  </button>
                 </div>
-              </motion.div>
-            )}
 
-            <div className="space-y-4 mb-8">
-              <div className="flex gap-4">
-                <input type="text" placeholder="Full Name" className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[#FF6B00] outline-none transition-all font-medium" />
-              </div>
-              <div className="flex gap-4">
-                <input type="email" placeholder="Email Address" className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[#FF6B00] outline-none transition-all font-medium" />
-              </div>
-              <div className="flex gap-4">
-                <input type="text" placeholder="PAN Number (for 80G tax receipt)" className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[#FF6B00] outline-none transition-all font-medium uppercase" />
-              </div>
-            </div>
+                {/* Tabs */}
+                <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setAltTab("qr")}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all border-0 ${altTab === 'qr' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900 bg-transparent'}`}
+                  >
+                    📱 UPI QR Scan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAltTab("bank")}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all border-0 ${altTab === 'bank' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900 bg-transparent'}`}
+                  >
+                    🏦 Bank Details
+                  </button>
+                </div>
 
-            <button className="w-full py-5 rounded-2xl text-white font-bold text-lg tracking-wider hover:scale-[1.02] transition-transform shadow-xl shadow-[#FF6B00]/30 flex items-center justify-center gap-3" style={{ backgroundColor: C.saffron }}>
-              <Heart className="w-5 h-5 fill-white" /> DONATE SECURELY
-            </button>
-            
-            <p className="text-center text-sm text-gray-400 mt-6 flex items-center justify-center gap-2">
-              <Lock className="w-4 h-4" /> 256-bit secure SSL encryption
-            </p>
-          </motion.div>
+                {altTab === "qr" ? (
+                  <div className="space-y-4 flex flex-col items-center">
+                    <div className="relative bg-white p-3 rounded-2xl border border-gray-100 shadow-sm max-w-[200px]">
+                      {/* Scanner corner frames */}
+                      <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#FF6B00]" />
+                      <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#FF6B00]" />
+                      <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#FF6B00]" />
+                      <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#FF6B00]" />
+                      <img 
+                        src="/website/photo_2026-05-24_12-55-12.jpg" 
+                        alt="UPI QR Code" 
+                        className="w-full h-auto rounded-lg"
+                      />
+                    </div>
+                    <div className="text-center w-full">
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Official UPI ID</span>
+                      <div className="flex items-center justify-between gap-2 mt-1.5 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 max-w-[245px] mx-auto">
+                        <code className="text-[10px] font-bold text-gray-800 font-mono">boim-712201590596@boi</code>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard("boim-712201590596@boi", "upi")}
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded text-white border-0 ${copiedField === 'upi' ? 'bg-emerald-600' : 'bg-gray-800 hover:bg-gray-950'}`}
+                        >
+                          {copiedField === 'upi' ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 bg-gray-50/50 p-4.5 rounded-2xl border border-gray-100 text-xs">
+                    <div>
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">Beneficiary Name</span>
+                      <strong className="text-gray-800 block text-sm mt-0.5">Human Pray Trust</strong>
+                    </div>
+                    <div className="h-px bg-gray-200/50" />
+                    <div>
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">Bank & Account Number</span>
+                      <div className="flex justify-between items-center gap-2 mt-0.5">
+                        <strong className="text-gray-800 block font-mono text-sm">7122 2011 0000 596</strong>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard("712220110000596", "acc")}
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded text-white border-0 ${copiedField === 'acc' ? 'bg-emerald-600' : 'bg-gray-800'}`}
+                        >
+                          {copiedField === 'acc' ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                      <span className="text-[10px] text-emerald-600 font-bold mt-0.5 block">Bank of India · Current Account</span>
+                    </div>
+                    <div className="h-px bg-gray-200/50" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">IFSC Code</span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <strong className="text-gray-800 font-mono text-sm">BKID0007122</strong>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard("BKID0007122", "ifsc")}
+                            className={`text-[8px] font-bold px-1.5 py-0.2 rounded text-white border-0 ${copiedField === 'ifsc' ? 'bg-emerald-600' : 'bg-gray-800'}`}
+                          >
+                            {copiedField === 'ifsc' ? "Copied" : "Copy"}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">Branch</span>
+                        <strong className="text-gray-800 block text-xs mt-0.5">Sector 62 Noida</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setShowAlternative(false)}
+                    className="w-full py-3.5 bg-gray-50 border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-100 transition-colors text-xs uppercase tracking-wider"
+                  >
+                    ← Pay with online card instead
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleDonateSubmit}>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Choose Amount</h3>
+                <p className="text-gray-500 mb-8">Select or enter an amount to donate securely</p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  {amounts.map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => { setSelectedAmount(amt); setCustomVal(""); }}
+                      className={`py-4 rounded-2xl font-bold text-lg border-2 transition-all ${selectedAmount === amt ? 'border-[#FF6B00] bg-[#FF6B00]/5 text-[#FF6B00]' : 'border-gray-100 hover:border-gray-300 text-gray-700'}`}
+                    >
+                      ₹{amt}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAmount('custom')}
+                    className={`py-4 rounded-2xl font-bold text-lg border-2 transition-all ${selectedAmount === 'custom' ? 'border-[#FF6B00] bg-[#FF6B00]/5 text-[#FF6B00]' : 'border-gray-100 hover:border-gray-300 text-gray-700'}`}
+                  >
+                    Other
+                  </button>
+                </div>
+                
+                {selectedAmount === 'custom' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6">
+                    <div className="relative">
+                      <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 text-xl font-bold">₹</span>
+                      <input 
+                        type="number" 
+                        placeholder="Enter amount" 
+                        value={customVal}
+                        onChange={e => setCustomVal(e.target.value)}
+                        className="w-full pl-12 pr-6 py-4 rounded-2xl bg-gray-50 border-2 border-gray-100 focus:outline-none focus:border-[#FF6B00] text-xl font-bold transition-colors" 
+                        required
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex gap-4">
+                    <input 
+                      type="text" 
+                      placeholder="Full Name" 
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[#FF6B00] outline-none transition-all font-medium" 
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <input 
+                      type="email" 
+                      placeholder="Email Address" 
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[#FF6B00] outline-none transition-all font-medium" 
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <input 
+                      type="text" 
+                      placeholder="PAN Number (Optional - for 80G tax receipt)" 
+                      value={pan}
+                      onChange={e => setPan(e.target.value)}
+                      className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[#FF6B00] outline-none transition-all font-medium uppercase" 
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" className="w-full py-5 rounded-2xl text-white font-bold text-lg tracking-wider hover:scale-[1.02] transition-transform shadow-xl shadow-[#FF6B00]/30 flex items-center justify-center gap-3" style={{ backgroundColor: C.saffron }}>
+                  <Heart className="w-5 h-5 fill-white" /> DONATE SECURELY
+                </button>
+
+                <div className="text-center mt-6">
+                  <button 
+                    type="button"
+                    onClick={() => setShowAlternative(true)}
+                    className="inline-block text-sm font-bold transition-colors hover:text-[#000000] bg-transparent border-0 cursor-pointer"
+                    style={{ color: C.saffron }}
+                  >
+                    🤝 Pay via direct UPI QR or Bank Transfer
+                  </button>
+                </div>
+              
+              <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-2">
+                <Lock className="w-4 h-4" /> 256-bit secure SSL encryption
+              </p>
+            </form>
+          )}
+        </motion.div>
         </div>
       </div>
     </section>
@@ -1132,9 +1328,9 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-2">
             <div className="text-2xl font-bold tracking-tight mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
-              <span style={{ color: C.saffron }}>human</span>{" "}
-              <span style={{ color: C.black }}>pray</span>{" "}
-              <span style={{ color: C.green }}>trust</span>
+              <span style={{ color: C.saffron }}>HUMAN</span>{" "}
+              <span style={{ color: C.black }}>PRAY</span>{" "}
+              <span style={{ color: C.green }}>TRUST</span>
             </div>
             <p className="text-gray-500 max-w-sm mb-8">An NGO dedicated to demonstrating human dignity through quiet, powerful action across India.</p>
           </div>
@@ -1175,8 +1371,174 @@ function Footer() {
   );
 }
 
+/* ─── Dog Feeding Mission ───────────────────────────────── */
+function DogFeedingMission() {
+  const steps = [
+    { icon: Search, title: "Locate Stray Packs", desc: "Finding stray canine populations in Noida and surrounding areas who survive on garbage." },
+    { icon: Gift, title: "Prepare Fresh Meals", desc: "Cooking nutritious, high-protein food (freshly cooked rice, eggs, healthy supplements) daily in our kitchens." },
+    { icon: Users, title: "Feeding Drives", desc: "Mobilizing our compassionate volunteer groups to feed hundreds of strays systematically every day." },
+  ];
+  return (
+    <section id="dog-feeding-mission" className="py-32" style={{ backgroundColor: C.cream }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          
+          {/* Symmetrical Left Image Column */}
+          <motion.div 
+            initial={{ opacity: 0, x: -50, scale: 0.95 }} 
+            whileInView={{ opacity: 1, x: 0, scale: 1 }} 
+            viewport={{ once: true, margin: "-100px" }} 
+            transition={{ duration: 1.2, ease: "easeOut" }} 
+            className="relative h-[600px] rounded-2xl overflow-hidden group shadow-2xl order-last lg:order-first"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2D6A4F]/20 to-transparent z-10 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700" />
+            <motion.div
+              className="absolute inset-0 w-full h-full"
+              whileHover={{ scale: 1.08 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              style={{
+                backgroundImage: "url('/NGO IMAGES/dog.jpeg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+          </motion.div>
+
+          {/* Left/Right Text Column */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeInUp} className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-px" style={{ backgroundColor: C.green }} />
+              <span className="text-sm tracking-[0.2em] uppercase font-bold" style={{ color: C.green }}>Compassion on Streets</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl mb-8 font-bold leading-tight" style={{ fontFamily: "'Playfair Display', serif", color: C.charcoal }}>
+              Dog Feeding<br />Mission
+            </h2>
+            <p className="text-lg text-gray-600 mb-12 leading-relaxed">
+              Thousands of street animals go days without single crumb of nourishment, left to fight hunger in silent despair. Our Dog Feeding Mission is committed to restoring their basic right to food and care. We serve freshly prepared, wholesome meals daily to strays to keep them healthy and loved.
+            </p>
+            <div className="space-y-10">
+              {steps.map((step, i) => (
+                <motion.div key={i} variants={fadeInUp} className="flex gap-6 items-start">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${C.green}15`, color: C.green }}>
+                    <step.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl mb-2" style={{ fontFamily: "'Playfair Display', serif", color: C.charcoal }}>{step.title}</h3>
+                    <p className="text-gray-600">{step.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div variants={fadeInUp} className="mt-12">
+              <a 
+                href="/donate?case=Dog%20Feeding" 
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-full text-white font-bold hover:scale-105 transition-transform shadow-lg shadow-[#2D6A4F]/20" 
+                style={{ backgroundColor: C.green, textDecoration: "none" }}
+              >
+                <span>Donate for Dog Feeding</span>
+                <ArrowRight className="w-5 h-5" />
+              </a>
+            </motion.div>
+          </motion.div>
+          
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Successful Stories ────────────────────────────────── */
+function SuccessfulStories({ stories }: { stories: any[] }) {
+  return (
+    <section id="successful-stories" className="py-32 bg-gray-50 relative overflow-hidden">
+      {/* Decorative backgrounds */}
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#FF6B00]/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-[#2D6A4F]/5 blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <div className="flex justify-center items-center gap-4 mb-6">
+            <div className="w-8 h-px" style={{ backgroundColor: C.saffron }} />
+            <span className="text-sm tracking-[0.2em] uppercase font-bold" style={{ color: C.saffron }}>Restoring Smiles · Our Triumphs</span>
+            <div className="w-8 h-px" style={{ backgroundColor: C.saffron }} />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: "'Playfair Display', serif", color: C.charcoal }}>
+            Successful Stories
+          </h2>
+          <p className="text-lg text-gray-600">
+            Every donation makes a life-changing difference. Here are some of our most beautiful success stories, showing the real impact of your compassion.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {stories.map((story, i) => (
+            <motion.div 
+              key={story.id || i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: i * 0.15 }}
+              className="bg-white rounded-[2.5rem] overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 flex flex-col group"
+            >
+              <div className="h-64 overflow-hidden relative bg-slate-100 shrink-0">
+                {story.imageUrl ? (
+                  <img 
+                    src={story.imageUrl} 
+                    alt={story.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">
+                    <Award className="w-12 h-12" />
+                  </div>
+                )}
+                <div className="absolute top-4 left-4 bg-emerald-600/90 text-white font-bold text-[10px] uppercase tracking-wider px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-sm border border-emerald-400/30">
+                  Dignity Restored
+                </div>
+              </div>
+
+              <div className="p-8 flex flex-col flex-1 justify-between">
+                <div className="space-y-4">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                    🏆 Success Achieved
+                  </span>
+                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#FF6B00] transition-colors" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    {story.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm leading-relaxed line-clamp-4">
+                    {story.description}
+                  </p>
+                </div>
+                
+                <div className="pt-6 border-t border-gray-100 mt-6 flex justify-between items-center text-xs text-slate-400 font-semibold">
+                  <span>Verified Triumph</span>
+                  <span>{new Date(story.createdAt).toLocaleDateString("en-IN")}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Page root ─────────────────────────────────────────── */
 export default function LandingPage() {
+  const [stories, setStories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/stories")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setStories(data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div className="w-full bg-white antialiased">
       <Navigation />
@@ -1187,9 +1549,11 @@ export default function LandingPage() {
         <SpecialDayMission />
         <LiveCases />
         <AnimalWelfare />
+        <DogFeedingMission />
         <ActionCards />
         <InitiativesGrid />
         <DonateSection />
+        {stories.length > 0 && <SuccessfulStories stories={stories} />}
         <VolunteerJourney />
         <Testimonials />
         <Gallery />

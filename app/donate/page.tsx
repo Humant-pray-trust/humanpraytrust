@@ -19,6 +19,7 @@ const CAUSES = [
   { id: "general", label: "Where Needed Most", emoji: "❤️" },
   { id: "medical", label: "Medical Aid", emoji: "🏥" },
   { id: "birthday", label: "Special Day Mission", emoji: "🎂" },
+  { id: "dog_feeding", label: "Dog Feeding Mission", emoji: "🐕" },
   { id: "animal",   label: "Animal Welfare",   emoji: "🐾" },
   { id: "education",label: "Education",         emoji: "📚" },
 ];
@@ -49,6 +50,29 @@ export default function DonatePage() {
           { id: `case_${caseParam}`, label: `Support ${caseParam} (Live Case)`, emoji: "❤️" },
           ...prev
         ]);
+      }
+      
+      const amountParam = params.get("amount");
+      if (amountParam) {
+        const parsed = parseInt(amountParam);
+        if (!isNaN(parsed) && parsed > 0) {
+          setAmount(parsed);
+        }
+      }
+
+      const nameParam = params.get("name");
+      const emailParam = params.get("email");
+      const phoneParam = params.get("phone");
+      const panParam = params.get("pan");
+      if (nameParam || emailParam || phoneParam || panParam) {
+        setForm(prev => ({
+          ...prev,
+          name: nameParam || prev.name,
+          email: emailParam || prev.email,
+          phone: phoneParam || prev.phone,
+          pan: panParam || prev.pan,
+        }));
+        setStep(3);
       }
     }
   }, []);
@@ -205,7 +229,7 @@ export default function DonatePage() {
 
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 8, marginTop: 8 }}>
           <img src="/website/human%20trust%20logo.jpg.jpeg" alt="Logo" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.2)" }} />
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}>Human Pray Trust</span>
+          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}>HUMAN PRAY TRUST</span>
         </div>
 
         <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.5rem,3.5vw,2.4rem)", color: "white", margin: "0 0 6px", lineHeight: 1.2, fontWeight: 700 }}>

@@ -1,6 +1,10 @@
 {
-  "/api/cases/route": "app/api/cases/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/about/page": "app/about/page.js",
+  "/live-cases/page": "app/live-cases/page.js",
+  "/donate/page": "app/donate/page.js",
+  "/gallery/page": "app/gallery/page.js",
+  "/api/stories/route": "app/api/stories/route.js",
+  "/api/cases/route": "app/api/cases/route.js",
   "/api/gallery/route": "app/api/gallery/route.js"
 }

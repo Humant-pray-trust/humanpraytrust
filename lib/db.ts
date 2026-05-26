@@ -76,6 +76,17 @@ export async function getDbPool(): Promise<mysql.Pool | null> {
           createdAt VARCHAR(255)
         )
       `);
+
+      // Auto-create success_stories table
+      await connection.query(`
+        CREATE TABLE IF NOT EXISTS success_stories (
+          id VARCHAR(255) PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          description TEXT,
+          imageUrl LONGTEXT,
+          createdAt VARCHAR(255)
+        )
+      `);
       connection.release();
       initialized = true;
       console.log("Database initialized successfully: tables synced.");

@@ -52,12 +52,16 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [authed, setAuthed] = useState(false);
-  const [activeTab, setActiveTab] = useState<"cases" | "donors" | "gallery" | "settings">("cases");
+  const [activeTab, setActiveTab] = useState<"cases" | "donors" | "gallery" | "stories" | "settings">("cases");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const [cases, setCases] = useState<Case[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
+  const [stories, setStories] = useState<any[]>([]);
+  const [storiesForm, setStoriesForm] = useState({ title: "", description: "" });
+  const [storyImageName, setStoryImageName] = useState("");
+  const storyRef = useRef<HTMLInputElement>(null);
   const [galleryForm, setGalleryForm] = useState({ aspect: "aspect-square" });
   
   const [loading, setLoading] = useState(false);
@@ -98,6 +102,7 @@ export default function AdminPage() {
       if (activeTab === "cases") fetchCases();
       if (activeTab === "donors") fetchDonations();
       if (activeTab === "gallery") fetchGallery();
+      if (activeTab === "stories") fetchStories();
     }
   }, [authed, activeTab]);
 
@@ -134,6 +139,16 @@ export default function AdminPage() {
       const uploadedOnly = Array.isArray(data) ? data.filter((item: any) => !item.id.startsWith("def_")) : [];
       setGallery(uploadedOnly);
     } catch { showToast("Failed to load gallery", "error"); }
+    finally { setLoading(false); }
+  }
+
+  async function fetchStories() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/stories");
+      const data = await res.json();
+      setStories(Array.isArray(data) ? data.reverse() : []);
+    } catch { showToast("Failed to load stories", "error"); }
     finally { setLoading(false); }
   }
 
@@ -235,6 +250,48 @@ export default function AdminPage() {
     }
   }
 
+  async function handleUploadStory(e: React.FormEvent) {
+    e.preventDefault();
+    if (!storiesForm.title || !storiesForm.description) return showToast("Title and description are required", "error");
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append("title", storiesForm.title);
+      fd.append("description", storiesForm.description);
+      if (storyRef.current?.files?.[0]) fd.append("image", storyRef.current.files[0]);
+      
+      const res = await fetch("/api/stories", {
+        method: "POST",
+        headers: { "x-admin-password": password },
+        body: fd
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      showToast("Story uploaded successfully!", "success");
+      setStoriesForm({ title: "", description: "" });
+      setStoryImageName("");
+      if (storyRef.current) storyRef.current.value = "";
+      fetchStories();
+    } catch (err: any) {
+      if (err.message === "Unauthorized") handleLogout();
+      showToast(err.message || "Failed to upload story", "error");
+    } finally { setSubmitting(false); }
+  }
+
+  async function handleDeleteStory(id: string) {
+    if (!confirm("Delete this story from your successes?")) return;
+    try {
+      const res = await fetch(`/api/stories/${id}`, { method: "DELETE", headers: { "x-admin-password": password } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      showToast("Story deleted", "success");
+      fetchStories();
+    } catch (err: any) {
+      if (err.message === "Unauthorized") handleLogout();
+      showToast(err.message || "Failed to delete story", "error");
+    }
+  }
+
   async function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
@@ -326,7 +383,7 @@ export default function AdminPage() {
             </div>
             
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
-              <span className="text-[#FF6B00]">human</span> <span className="text-white">pray</span> <span className="text-[#2D6A4F]">trust</span>
+              <span className="text-[#FF6B00]">HUMAN</span> <span className="text-white">PRAY</span> <span className="text-[#2D6A4F]">TRUST</span>
             </h1>
             <p className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-400">Secure Admin Panel</p>
           </div>
@@ -424,7 +481,7 @@ export default function AdminPage() {
           />
           <div>
             <h1 className="font-bold text-sm tracking-tight text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
-              <span className="text-[#FF6B00]">human</span> <span className="text-white">pray</span> <span className="text-[#2D6A4F]">trust</span>
+              <span className="text-[#FF6B00]">HUMAN</span> <span className="text-white">PRAY</span> <span className="text-[#2D6A4F]">TRUST</span>
             </h1>
             <span className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold block -mt-0.5">Admin Panel</span>
           </div>
@@ -469,7 +526,7 @@ export default function AdminPage() {
                     />
                     <div>
                       <h1 className="font-bold text-sm text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
-                        <span className="text-[#FF6B00]">human</span> <span className="text-white">pray</span>
+                        <span className="text-[#FF6B00]">HUMAN</span> <span className="text-white">PRAY</span>
                       </h1>
                       <span className="text-[10px] text-slate-400 uppercase tracking-widest block">Dashboard</span>
                     </div>
@@ -487,6 +544,7 @@ export default function AdminPage() {
                     { id: "cases", label: "Cases List", icon: LayoutDashboard },
                     { id: "donors", label: "Donors Hub", icon: HeartHandshake },
                     { id: "gallery", label: "Gallery Assets", icon: ImageIcon },
+                    { id: "stories", label: "Successful Stories", icon: Award },
                     { id: "settings", label: "Admin Settings", icon: Settings },
                   ].map(tab => {
                     const Icon = tab.icon;
@@ -545,7 +603,7 @@ export default function AdminPage() {
             </div>
             <div>
               <h1 className="font-bold text-base leading-none text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
-                <span className="text-[#FF6B00]">human</span> <span className="text-white">pray</span> <span className="text-[#2D6A4F]">trust</span>
+                <span className="text-[#FF6B00]">HUMAN</span> <span className="text-white">PRAY</span> <span className="text-[#2D6A4F]">TRUST</span>
               </h1>
               <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-slate-400 mt-1 block">Management Suite</span>
             </div>
@@ -557,6 +615,7 @@ export default function AdminPage() {
               { id: "cases", label: "Fundraiser Cases", icon: LayoutDashboard },
               { id: "donors", label: "Donation Records", icon: HeartHandshake },
               { id: "gallery", label: "Gallery Assets", icon: ImageIcon },
+              { id: "stories", label: "Successful Stories", icon: Award },
               { id: "settings", label: "Admin Settings", icon: Settings },
             ].map(tab => {
               const Icon = tab.icon;
@@ -1268,6 +1327,143 @@ export default function AdminPage() {
 
               </div>
 
+            </div>
+          )}
+
+          {/* ── STORIES TAB ── */}
+          {activeTab === "stories" && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                
+                {/* Story Upload Control Card */}
+                <div className="xl:col-span-4 bg-white rounded-3xl p-5 md:p-7 shadow-sm border border-slate-100 xl:sticky xl:top-[96px] space-y-6">
+                  <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
+                    <Award className="w-5 h-5 text-[#FF6B00]" />
+                    <h3 className="font-bold text-base text-slate-800">Add Successful Story</h3>
+                  </div>
+
+                  <form onSubmit={handleUploadStory} className="space-y-4">
+                    <div className="space-y-1">
+                      <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Story Title *</label>
+                      <input 
+                        value={storiesForm.title} 
+                        onChange={e => setStoriesForm({ ...storiesForm, title: e.target.value })} 
+                        placeholder="e.g. Stray dog rescued & fully rehabilitated" 
+                        className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm outline-none transition-all focus:border-[#FF6B00] focus:ring-4 focus:ring-[#FF6B00]/5"
+                        required 
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Description *</label>
+                      <textarea 
+                        value={storiesForm.description} 
+                        onChange={e => setStoriesForm({ ...storiesForm, description: e.target.value })} 
+                        placeholder="Describe this success story in detail..." 
+                        rows={5}
+                        className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm outline-none resize-none transition-all focus:border-[#FF6B00] focus:ring-4 focus:ring-[#FF6B00]/5"
+                        required 
+                      />
+                    </div>
+
+                    {/* Styled Image Input Dropzone */}
+                    <div className="space-y-1">
+                      <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1 block">Story Photo</label>
+                      <div 
+                        onClick={() => storyRef.current?.click()}
+                        className="border-2 border-dashed border-slate-200 hover:border-[#FF6B00] rounded-2xl p-6 text-center cursor-pointer transition-colors bg-slate-50/20 flex flex-col items-center justify-center gap-2 group"
+                      >
+                        <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-[#FF6B00] transition-colors" />
+                        <span className="text-xs font-semibold text-slate-600 block">
+                          {storyImageName ? storyImageName : "Select Story Photo"}
+                        </span>
+                        <span className="text-[10px] text-slate-400">JPG, PNG or WebP up to 8MB</span>
+                        <input 
+                          ref={storyRef} 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={e => setStoryImageName(e.target.files?.[0]?.name || "")}
+                          className="hidden" 
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      disabled={submitting} 
+                      className="w-full py-3.5 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold rounded-2xl tracking-wider text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-4"
+                    >
+                      {submitting ? "Uploading story..." : "Publish Story"}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Story List Section */}
+                <div className="xl:col-span-8 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                    <h3 className="font-bold text-base text-slate-800">Successful Stories</h3>
+                    <span className="text-xs font-semibold text-slate-400">{stories.length} stories listed</span>
+                  </div>
+
+                  {loading ? (
+                    <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center text-slate-400 font-medium">
+                      <RefreshCw className="w-8 h-8 mx-auto animate-spin mb-3 text-slate-300" />
+                      Loading successful stories...
+                    </div>
+                  ) : stories.length === 0 ? (
+                    <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center text-slate-400">
+                      <Award className="w-12 h-12 mx-auto mb-3 text-slate-200" />
+                      <span className="font-semibold block mb-1">No Success Stories Published</span>
+                      <span className="text-xs text-slate-400">Add a story using the form to display successes on the landing page!</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {stories.map(s => (
+                        <motion.div 
+                          layout
+                          key={s.id}
+                          className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col sm:flex-row hover:shadow-md transition-all duration-300"
+                        >
+                          <div className="w-full sm:w-[160px] h-[160px] relative bg-slate-100 shrink-0">
+                            {s.imageUrl ? (
+                              <img src={s.imageUrl} alt={s.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                <ImageIcon className="w-8 h-8" />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="p-5 flex-1 min-w-0 flex flex-col justify-between">
+                            <div className="space-y-2">
+                              <h4 className="font-bold text-slate-800 text-sm md:text-base leading-tight truncate">
+                                {s.title}
+                              </h4>
+                              <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
+                                {s.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-4 pt-3 border-t border-slate-100 mt-4">
+                              <span className="text-[10px] text-slate-400">
+                                Published: {new Date(s.createdAt).toLocaleDateString("en-IN")}
+                              </span>
+                              <button 
+                                onClick={() => handleDeleteStory(s.id)}
+                                className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors border border-rose-100"
+                                title="Delete Story"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+              </div>
             </div>
           )}
 
