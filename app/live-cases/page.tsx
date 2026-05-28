@@ -14,6 +14,68 @@ const C = {
   black: "#000000",
 };
 
+const renderBoldText = (text: string) => {
+  if (!text) return "";
+  const parts = text.split(/(\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return <strong key={i} className="font-extrabold text-[#1a1a2e]">{part.slice(1, -1)}</strong>;
+    }
+    return part;
+  });
+};
+
+function DonationTrack({ raised = 0, goal = 0 }: { raised: number; goal: number }) {
+  if (goal <= 0) return null;
+  const percentage = goal > 0 ? (raised / goal) * 100 : 0;
+  const radius = 35;
+  const strokeWidth = 5;
+  const normalizedRadius = radius - strokeWidth;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (Math.min(100, Math.max(0, percentage)) / 100) * circumference;
+
+  return (
+    <div className="flex items-center gap-4 py-3 px-4 bg-gray-50/50 rounded-2xl border border-gray-100 mt-4 max-w-full">
+      {/* Circle progress */}
+      <div className="relative flex items-center justify-center shrink-0 w-[74px] h-[74px]">
+        <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
+          <circle
+            stroke="#f1f1f1"
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+          <circle
+            stroke="#22c55e" /* Green progress */
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference + ' ' + circumference}
+            style={{ strokeDashoffset, transition: "stroke-dashoffset 0.5s ease" }}
+            strokeLinecap="round"
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+        </svg>
+        <span className="absolute text-xs font-bold text-gray-800">{Math.round(percentage)}%</span>
+      </div>
+
+      {/* Info texts */}
+      <div className="flex flex-col justify-center select-none">
+        <span className="text-[11px] text-gray-400 font-medium leading-none mb-1">Raised</span>
+        <span className="text-base font-extrabold text-[#701a28] tracking-tight leading-tight">
+          Rs.{raised.toLocaleString("en-IN")}
+        </span>
+        <span className="text-[11px] text-gray-500 font-medium mt-0.5 leading-none">
+          of Rs.{goal.toLocaleString("en-IN")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function LiveCasesPage() {
   const [cases, setCases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,13 +178,13 @@ export default function LiveCasesPage() {
                     </div>
                   </div>
                   <div className="p-8 flex flex-col flex-1">
-                    <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{c.title}</h3>
+                    <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{renderBoldText(c.title)}</h3>
                     <div className="flex-1 mb-8">
                       <p 
                         className="text-gray-500 text-sm leading-relaxed transition-all duration-300" 
                         style={expandedCases.includes(i) ? undefined : { display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                       >
-                        {c.description}
+                        {renderBoldText(c.description)}
                       </p>
                       {c.description && c.description.length > 120 && (
                         <button 
@@ -132,6 +194,7 @@ export default function LiveCasesPage() {
                           {expandedCases.includes(i) ? "Read Less" : "Read More"}
                         </button>
                       )}
+                      <DonationTrack raised={c.raisedAmount} goal={c.goalAmount} />
                     </div>
                     <div className="grid grid-cols-2 gap-3 mt-auto">
                       <a 

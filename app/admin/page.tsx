@@ -67,7 +67,11 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
-  const [form, setForm] = useState({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "" });
+  const [form, setForm] = useState({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "", raisedAmount: "" });
+  const [editingCaseId, setEditingCaseId] = useState<string | null>(null);
+  const [editRaisedVal, setEditRaisedVal] = useState<string>("");
+  const [editingCase, setEditingCase] = useState<Case | null>(null);
+  const [editingStory, setEditingStory] = useState<any | null>(null);
   
   const [newPassword, setNewPassword] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -177,6 +181,30 @@ export default function AdminPage() {
     setGallery([]);
   }
 
+  function startEditCase(c: Case) {
+    setEditingCase(c);
+    setForm({
+      title: c.title || "",
+      patientName: c.patientName || "",
+      location: c.location || "",
+      urgency: c.urgency || "medium",
+      description: c.description || "",
+      goalAmount: c.goalAmount ? c.goalAmount.toString() : "",
+      raisedAmount: c.raisedAmount ? c.raisedAmount.toString() : "",
+    });
+    setCaseImageName(c.imageUrl ? "Current Image (Click to change)" : "");
+    setCaseDocName(c.documentName || (c.documentUrl ? "Current Verification Doc" : ""));
+  }
+
+  function cancelEditCase() {
+    setEditingCase(null);
+    setForm({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "", raisedAmount: "" });
+    setCaseImageName("");
+    setCaseDocName("");
+    if (imageRef.current) imageRef.current.value = "";
+    if (docRef.current) docRef.current.value = "";
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.title || !form.description) return showToast("Title and description are required", "error");
@@ -186,19 +214,19 @@ export default function AdminPage() {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (imageRef.current?.files?.[0]) fd.append("image", imageRef.current.files[0]);
       if (docRef.current?.files?.[0]) fd.append("document", docRef.current.files[0]);
-      const res = await fetch("/api/cases", { method: "POST", headers: { "x-admin-password": password }, body: fd });
+      
+      const url = editingCase ? `/api/cases/${editingCase.id}` : "/api/cases";
+      const method = editingCase ? "PATCH" : "POST";
+      const res = await fetch(url, { method, headers: { "x-admin-password": password }, body: fd });
+      
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      showToast("Case added successfully!", "success");
-      setForm({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "" });
-      setCaseImageName("");
-      setCaseDocName("");
-      if (imageRef.current) imageRef.current.value = "";
-      if (docRef.current) docRef.current.value = "";
+      showToast(editingCase ? "Case updated successfully!" : "Case added successfully!", "success");
+      cancelEditCase();
       fetchCases();
     } catch (err: any) {
       if (err.message === "Unauthorized") handleLogout();
-      showToast(err.message || "Failed to add case", "error");
+      showToast(err.message || (editingCase ? "Failed to update case" : "Failed to add case"), "error");
     } finally { setSubmitting(false); }
   }
 
@@ -213,6 +241,40 @@ export default function AdminPage() {
     const res = await fetch(`/api/cases/${id}`, { method: "PATCH", headers: { "x-admin-password": password, "Content-Type": "application/json" }, body: JSON.stringify({ isActive: !current }) });
     if (res.ok) { showToast(`Case ${!current ? "activated" : "deactivated"}`, "success"); fetchCases(); }
   }
+
+  async function handleSaveRaised(id: string) {
+    if (editRaisedVal.trim() === "") return showToast("Enter a valid raised amount", "error");
+    const amountNum = parseFloat(editRaisedVal);
+    if (isNaN(amountNum) || amountNum < 0) return showToast("Enter a positive number", "error");
+    
+    try {
+      const res = await fetch(`/api/cases/${id}`, {
+        method: "PATCH",
+        headers: {
+          "x-admin-password": password,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ raisedAmount: amountNum })
+      });
+      if (!res.ok) throw new Error("Failed to update raised amount");
+      showToast("Raised amount updated successfully!", "success");
+      setEditingCaseId(null);
+      fetchCases();
+    } catch (err: any) {
+      showToast(err.message || "Failed to update raised amount", "error");
+    }
+  }
+
+  const renderBoldText = (text: string) => {
+    if (!text) return "";
+    const parts = text.split(/(\*[^*]+\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith("*") && part.endsWith("*")) {
+        return <strong key={i} className="font-extrabold text-slate-900">{part.slice(1, -1)}</strong>;
+      }
+      return part;
+    });
+  };
 
   async function handleUploadGallery(e: React.FormEvent) {
     e.preventDefault();
@@ -250,6 +312,22 @@ export default function AdminPage() {
     }
   }
 
+  function startEditStory(s: any) {
+    setEditingStory(s);
+    setStoriesForm({
+      title: s.title || "",
+      description: s.description || "",
+    });
+    setStoryImageName(s.imageUrl ? "Current Image (Click to change)" : "");
+  }
+
+  function cancelEditStory() {
+    setEditingStory(null);
+    setStoriesForm({ title: "", description: "" });
+    setStoryImageName("");
+    if (storyRef.current) storyRef.current.value = "";
+  }
+
   async function handleUploadStory(e: React.FormEvent) {
     e.preventDefault();
     if (!storiesForm.title || !storiesForm.description) return showToast("Title and description are required", "error");
@@ -260,21 +338,22 @@ export default function AdminPage() {
       fd.append("description", storiesForm.description);
       if (storyRef.current?.files?.[0]) fd.append("image", storyRef.current.files[0]);
       
-      const res = await fetch("/api/stories", {
-        method: "POST",
+      const url = editingStory ? `/api/stories/${editingStory.id}` : "/api/stories";
+      const method = editingStory ? "PATCH" : "POST";
+      
+      const res = await fetch(url, {
+        method,
         headers: { "x-admin-password": password },
         body: fd
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      showToast("Story uploaded successfully!", "success");
-      setStoriesForm({ title: "", description: "" });
-      setStoryImageName("");
-      if (storyRef.current) storyRef.current.value = "";
+      showToast(editingStory ? "Story updated successfully!" : "Story uploaded successfully!", "success");
+      cancelEditStory();
       fetchStories();
     } catch (err: any) {
       if (err.message === "Unauthorized") handleLogout();
-      showToast(err.message || "Failed to upload story", "error");
+      showToast(err.message || (editingStory ? "Failed to update story" : "Failed to upload story"), "error");
     } finally { setSubmitting(false); }
   }
 
@@ -762,9 +841,22 @@ export default function AdminPage() {
                 
                 {/* ── Form Section: Add Case (Grid Col: 5) ── */}
                 <div className="xl:col-span-5 bg-white rounded-3xl p-5 md:p-7 shadow-sm border border-slate-100 xl:sticky xl:top-[96px] space-y-6">
-                  <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-                    <Plus className="w-5 h-5 text-[#FF6B00]" />
-                    <h3 className="font-bold text-base text-slate-800">Launch Fundraiser Case</h3>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <Plus className="w-5 h-5 text-[#FF6B00]" />
+                      <h3 className="font-bold text-base text-slate-800">
+                        {editingCase ? "Edit Fundraiser Case" : "Launch Fundraiser Case"}
+                      </h3>
+                    </div>
+                    {editingCase && (
+                      <button
+                        type="button"
+                        onClick={cancelEditCase}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border-0 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -800,7 +892,7 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-1">
                         <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Urgency Level</label>
                         <select 
@@ -820,6 +912,16 @@ export default function AdminPage() {
                           value={form.goalAmount} 
                           onChange={e => setForm({ ...form, goalAmount: e.target.value })} 
                           placeholder="e.g. 150000" 
+                          className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm outline-none transition-all focus:border-[#FF6B00]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Raised Amount (₹)</label>
+                        <input 
+                          type="number" 
+                          value={form.raisedAmount} 
+                          onChange={e => setForm({ ...form, raisedAmount: e.target.value })} 
+                          placeholder="e.g. 10000" 
                           className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm outline-none transition-all focus:border-[#FF6B00]"
                         />
                       </div>
@@ -886,8 +988,17 @@ export default function AdminPage() {
                       disabled={submitting} 
                       className="w-full py-3.5 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold rounded-2xl tracking-wider text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-4"
                     >
-                      {submitting ? "Processing Asset..." : "Launch Fundraiser"}
+                      {submitting ? "Processing Asset..." : (editingCase ? "Save Changes" : "Launch Fundraiser")}
                     </button>
+                    {editingCase && (
+                      <button 
+                        type="button" 
+                        onClick={cancelEditCase}
+                        className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl tracking-wider text-xs transition-all flex items-center justify-center mt-2 border-0 cursor-pointer"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
                   </form>
                 </div>
 
@@ -944,7 +1055,7 @@ export default function AdminPage() {
                               <div className="space-y-2">
                                 <div className="flex items-start justify-between gap-3">
                                   <h4 className="font-bold text-sm md:text-base text-slate-800 tracking-tight leading-tight line-clamp-1">
-                                    {c.title}
+                                    {renderBoldText(c.title)}
                                   </h4>
                                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
                                     c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"
@@ -964,18 +1075,58 @@ export default function AdminPage() {
                                 </div>
 
                                 <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                                  {c.description}
+                                  {renderBoldText(c.description)}
                                 </p>
                               </div>
 
                               <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-4">
-                                {c.goalAmount > 0 ? (
-                                  <div className="text-xs font-semibold text-slate-800">
-                                    Target amount: <span className="text-[#FF6B00] font-bold">₹{c.goalAmount.toLocaleString("en-IN")}</span>
-                                  </div>
-                                ) : (
-                                  <div className="text-xs text-slate-400 font-medium">Ongoing Support</div>
-                                )}
+                                <div className="flex flex-col gap-1">
+                                  {c.goalAmount > 0 ? (
+                                    <div className="text-xs font-semibold text-slate-800">
+                                      Target amount: <span className="text-[#FF6B00] font-bold">₹{c.goalAmount.toLocaleString("en-IN")}</span>
+                                    </div>
+                                  ) : (
+                                    <div className="text-xs text-slate-400 font-medium">Ongoing Support</div>
+                                  )}
+
+                                  {editingCaseId === c.id ? (
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <input
+                                        type="number"
+                                        value={editRaisedVal}
+                                        onChange={(e) => setEditRaisedVal(e.target.value)}
+                                        className="px-2 py-1 text-xs border border-slate-300 rounded-md w-24 outline-none focus:border-[#FF6B00]"
+                                        placeholder="Raised"
+                                      />
+                                      <button
+                                        onClick={() => handleSaveRaised(c.id)}
+                                        className="px-2 py-1 bg-emerald-600 text-white rounded-md text-xs font-bold hover:bg-emerald-700 border-0 cursor-pointer"
+                                      >
+                                        Save
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingCaseId(null)}
+                                        className="px-2 py-1 bg-slate-200 text-slate-700 rounded-md text-xs font-bold hover:bg-slate-300 border-0 cursor-pointer"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="text-xs font-semibold text-slate-800 flex items-center gap-2">
+                                      <span>Raised:</span>
+                                      <span className="text-emerald-600 font-bold">₹{(c.raisedAmount || 0).toLocaleString("en-IN")}</span>
+                                      <button
+                                        onClick={() => {
+                                          setEditingCaseId(c.id);
+                                          setEditRaisedVal((c.raisedAmount || 0).toString());
+                                        }}
+                                        className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded text-[10px] font-bold transition-colors border-0 cursor-pointer"
+                                      >
+                                        Edit
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
 
                                 {/* Card Actions */}
                                 <div className="flex items-center gap-2">
@@ -988,6 +1139,13 @@ export default function AdminPage() {
                                       <FileText className="w-4 h-4" />
                                     </button>
                                   )}
+                                  <button 
+                                    onClick={() => startEditCase(c)}
+                                    className="px-3 py-1.5 rounded-xl font-bold text-xs bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1 cursor-pointer"
+                                    title="Edit Case Details"
+                                  >
+                                    Edit Details
+                                  </button>
                                   <button 
                                     onClick={() => toggleActive(c.id, c.isActive)}
                                     className={`px-3 py-1.5 rounded-xl font-bold text-xs border transition-colors flex items-center gap-1 ${
@@ -1337,9 +1495,22 @@ export default function AdminPage() {
                 
                 {/* Story Upload Control Card */}
                 <div className="xl:col-span-4 bg-white rounded-3xl p-5 md:p-7 shadow-sm border border-slate-100 xl:sticky xl:top-[96px] space-y-6">
-                  <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-                    <Award className="w-5 h-5 text-[#FF6B00]" />
-                    <h3 className="font-bold text-base text-slate-800">Add Successful Story</h3>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <Award className="w-5 h-5 text-[#FF6B00]" />
+                      <h3 className="font-bold text-base text-slate-800">
+                        {editingStory ? "Edit Success Story" : "Add Successful Story"}
+                      </h3>
+                    </div>
+                    {editingStory && (
+                      <button
+                        type="button"
+                        onClick={cancelEditStory}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border-0 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
 
                   <form onSubmit={handleUploadStory} className="space-y-4">
@@ -1393,8 +1564,17 @@ export default function AdminPage() {
                       disabled={submitting} 
                       className="w-full py-3.5 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold rounded-2xl tracking-wider text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-4"
                     >
-                      {submitting ? "Uploading story..." : "Publish Story"}
+                      {submitting ? "Processing Story..." : (editingStory ? "Save Changes" : "Publish Story")}
                     </button>
+                    {editingStory && (
+                      <button 
+                        type="button" 
+                        onClick={cancelEditStory}
+                        className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl tracking-wider text-xs transition-all flex items-center justify-center mt-2 border-0 cursor-pointer"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
                   </form>
                 </div>
 
@@ -1424,9 +1604,9 @@ export default function AdminPage() {
                           key={s.id}
                           className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col sm:flex-row hover:shadow-md transition-all duration-300"
                         >
-                          <div className="w-full sm:w-[160px] h-[160px] relative bg-slate-100 shrink-0">
+                          <div className="w-full sm:w-[160px] h-[160px] relative bg-slate-50 flex items-center justify-center border-r border-slate-100 shrink-0">
                             {s.imageUrl ? (
-                              <img src={s.imageUrl} alt={s.title} className="w-full h-full object-cover" />
+                              <img src={s.imageUrl} alt={s.title} className="w-full h-full object-contain p-1.5" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-slate-300">
                                 <ImageIcon className="w-8 h-8" />
@@ -1448,13 +1628,22 @@ export default function AdminPage() {
                               <span className="text-[10px] text-slate-400">
                                 Published: {new Date(s.createdAt).toLocaleDateString("en-IN")}
                               </span>
-                              <button 
-                                onClick={() => handleDeleteStory(s.id)}
-                                className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors border border-rose-100"
-                                title="Delete Story"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={() => startEditStory(s)}
+                                  className="px-3 py-1.5 rounded-xl font-bold text-xs bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1 cursor-pointer"
+                                  title="Edit Story"
+                                >
+                                  Edit Details
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteStory(s.id)}
+                                  className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors border border-rose-100"
+                                  title="Delete Story"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </motion.div>

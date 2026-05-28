@@ -78,6 +78,8 @@ export async function POST(req: Request) {
     const image       = formData.get("image") as File | null;
     const document    = formData.get("document") as File | null;
 
+    const raisedAmount = formData.get("raisedAmount") as string;
+
     if (!title || !description) {
       return NextResponse.json({ error: "Title and description are required." }, { status: 400 });
     }
@@ -139,7 +141,7 @@ export async function POST(req: Request) {
       urgency:      urgency || "medium",
       description,
       goalAmount:   parseFloat(goalAmount) || 0,
-      raisedAmount: 0,
+      raisedAmount: parseFloat(raisedAmount) || 0,
       imageUrl,
       documentUrl,
       documentName,

@@ -496,6 +496,68 @@ function ActionCards() {
   );
 }
 
+const renderBoldText = (text: string) => {
+  if (!text) return "";
+  const parts = text.split(/(\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return <strong key={i} className="font-extrabold text-[#1a1a2e]">{part.slice(1, -1)}</strong>;
+    }
+    return part;
+  });
+};
+
+function DonationTrack({ raised = 0, goal = 0 }: { raised: number; goal: number }) {
+  if (goal <= 0) return null;
+  const percentage = goal > 0 ? (raised / goal) * 100 : 0;
+  const radius = 35;
+  const strokeWidth = 5;
+  const normalizedRadius = radius - strokeWidth;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (Math.min(100, Math.max(0, percentage)) / 100) * circumference;
+
+  return (
+    <div className="flex items-center gap-4 py-3 px-4 bg-gray-50/50 rounded-2xl border border-gray-100 mt-4 max-w-full">
+      {/* Circle progress */}
+      <div className="relative flex items-center justify-center shrink-0 w-[74px] h-[74px]">
+        <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
+          <circle
+            stroke="#f1f1f1"
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+          <circle
+            stroke="#22c55e" /* Green progress */
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference + ' ' + circumference}
+            style={{ strokeDashoffset, transition: "stroke-dashoffset 0.5s ease" }}
+            strokeLinecap="round"
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+        </svg>
+        <span className="absolute text-xs font-bold text-gray-800">{Math.round(percentage)}%</span>
+      </div>
+
+      {/* Info texts */}
+      <div className="flex flex-col justify-center select-none">
+        <span className="text-[11px] text-gray-400 font-medium leading-none mb-1">Raised</span>
+        <span className="text-base font-extrabold text-[#701a28] tracking-tight leading-tight">
+          Rs.{raised.toLocaleString("en-IN")}
+        </span>
+        <span className="text-[11px] text-gray-500 font-medium mt-0.5 leading-none">
+          of Rs.{goal.toLocaleString("en-IN")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Live Cases ────────────────────────────────────────── */
 function LiveCases() {
   const [cases, setCases] = useState<any[]>([]);
@@ -547,7 +609,7 @@ function LiveCases() {
               <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 flex flex-col transition-transform duration-300 hover:-translate-y-2">
                 <div className="relative h-64 overflow-hidden group bg-gray-50 flex items-center justify-center border-b border-gray-100">
                   <motion.img 
-                    whileHover={{ scale: 1.05 }}
+                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.5 }}
                     src={c.imageUrl} 
                     alt={c.title} 
@@ -558,13 +620,13 @@ function LiveCases() {
                   </div>
                 </div>
                 <div className="p-8 flex flex-col flex-1">
-                  <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{c.title}</h3>
+                  <h3 className="text-2xl font-bold mb-4" style={{ color: C.charcoal }}>{renderBoldText(c.title)}</h3>
                   <div className="flex-1 mb-8">
                     <p 
                       className="text-gray-500 text-sm leading-relaxed transition-all duration-300" 
                       style={expandedCases.includes(i) ? undefined : { display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                     >
-                      {c.description}
+                      {renderBoldText(c.description)}
                     </p>
                     {c.description && c.description.length > 120 && (
                       <button 
@@ -574,6 +636,7 @@ function LiveCases() {
                         {expandedCases.includes(i) ? "Read Less" : "Read More"}
                       </button>
                     )}
+                    <DonationTrack raised={c.raisedAmount} goal={c.goalAmount} />
                   </div>
                   <div className="grid grid-cols-2 gap-3 mt-auto">
                     <a href={`/donate?case=${encodeURIComponent(c.title)}`} className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center" style={{ backgroundColor: "#E65A00", textDecoration: "none" }}>
@@ -1481,12 +1544,12 @@ function SuccessfulStories({ stories }: { stories: any[] }) {
               transition={{ duration: 0.6, delay: i * 0.15 }}
               className="bg-white rounded-[2.5rem] overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 flex flex-col group"
             >
-              <div className="h-64 overflow-hidden relative bg-slate-100 shrink-0">
+              <div className="h-64 overflow-hidden relative bg-gray-50 flex items-center justify-center border-b border-gray-100 shrink-0">
                 {story.imageUrl ? (
                   <img 
                     src={story.imageUrl} 
                     alt={story.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    className="w-full h-full object-contain p-2 group-hover:scale-[1.03] transition-transform duration-500" 
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">
