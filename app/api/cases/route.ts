@@ -47,6 +47,7 @@ export async function GET() {
       const mapped = (rows as any[]).map(row => ({
         ...row,
         isActive: !!row.isActive,
+        showProgress: row.showProgress === undefined ? true : !!row.showProgress,
       }));
       return NextResponse.json(mapped);
     }
@@ -79,6 +80,8 @@ export async function POST(req: Request) {
     const document    = formData.get("document") as File | null;
 
     const raisedAmount = formData.get("raisedAmount") as string;
+    const showProgressVal = formData.get("showProgress");
+    const showProgress = showProgressVal === null ? true : showProgressVal === "true";
 
     if (!title || !description) {
       return NextResponse.json({ error: "Title and description are required." }, { status: 400 });
@@ -147,13 +150,14 @@ export async function POST(req: Request) {
       documentName,
       createdAt:    new Date().toISOString(),
       isActive:     true,
+      showProgress,
     };
 
     const pool = await getDbPool();
     if (pool) {
       await pool.query(
-        `INSERT INTO cases (id, title, patientName, location, urgency, description, goalAmount, raisedAmount, imageUrl, documentUrl, documentName, createdAt, isActive) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO cases (id, title, patientName, location, urgency, description, goalAmount, raisedAmount, imageUrl, documentUrl, documentName, createdAt, isActive, showProgress) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           newCase.id,
           newCase.title,
@@ -168,6 +172,7 @@ export async function POST(req: Request) {
           newCase.documentName,
           newCase.createdAt,
           newCase.isActive ? 1 : 0,
+          newCase.showProgress ? 1 : 0,
         ]
       );
     } else {

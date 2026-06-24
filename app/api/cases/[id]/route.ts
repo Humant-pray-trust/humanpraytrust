@@ -163,6 +163,9 @@ export async function PATCH(
         }
       }
 
+      const showProgressVal = formData.get("showProgress");
+      const showProgress = showProgressVal === null ? (existingCase.showProgress !== undefined ? !!existingCase.showProgress : true) : showProgressVal === "true";
+
       body = {
         title,
         patientName: patientName || "",
@@ -173,7 +176,8 @@ export async function PATCH(
         raisedAmount: parseFloat(raisedAmount) || 0,
         imageUrl,
         documentUrl,
-        documentName
+        documentName,
+        showProgress
       };
     } else {
       body = await req.json();
@@ -187,14 +191,19 @@ export async function PATCH(
         const keys = Object.keys(body);
         if (keys.length > 0) {
           const assignments = keys.map(k => `${k} = ?`).join(", ");
-          const values = keys.map(k => body[k]);
+          const values = keys.map(k => {
+            if (k === "showProgress" || k === "isActive") {
+              return (body[k] === "true" || body[k] === true || body[k] === 1) ? 1 : 0;
+            }
+            return body[k];
+          });
           await pool.query(`UPDATE cases SET ${assignments} WHERE id = ?`, [...values, params.id]);
         }
       }
     } else {
       const cases = await readCases();
-      const updated = cases.map((c: { id: string }) =>
-        c.id === params.id ? { ...c, ...body } : c
+      const updated = cases.map((c: any) =>
+        c.id === params.id ? { ...c, ...body, showProgress: body.showProgress === undefined ? c.showProgress : (body.showProgress === "true" || body.showProgress === true) } : c
       );
 
       await writeCases(updated);

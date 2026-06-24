@@ -1,6 +1,8 @@
 {
   "/page": "app/page.js",
-  "/api/cases/[id]/route": "app/api/cases/[id]/route.js",
   "/admin/page": "app/admin/page.js",
-  "/api/cases/route": "app/api/cases/route.js"
+  "/api/cases/[id]/route": "app/api/cases/[id]/route.js",
+  "/api/cases/route": "app/api/cases/route.js",
+  "/api/gallery/route": "app/api/gallery/route.js",
+  "/api/stories/route": "app/api/stories/route.js"
 }

@@ -194,7 +194,9 @@ export default function LiveCasesPage() {
                           {expandedCases.includes(i) ? "Read Less" : "Read More"}
                         </button>
                       )}
-                      <DonationTrack raised={c.raisedAmount} goal={c.goalAmount} />
+                      {c.showProgress !== false && (
+                        <DonationTrack raised={c.raisedAmount} goal={c.goalAmount} />
+                      )}
                     </div>
                     <div className="grid grid-cols-2 gap-3 mt-auto">
                       <a 

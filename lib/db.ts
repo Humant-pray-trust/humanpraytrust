@@ -43,12 +43,20 @@ export async function getDbPool(): Promise<mysql.Pool | null> {
           documentUrl LONGTEXT,
           documentName VARCHAR(255) DEFAULT '',
           createdAt VARCHAR(255),
-          isActive TINYINT(1) DEFAULT 1
+          isActive TINYINT(1) DEFAULT 1,
+          showProgress TINYINT(1) DEFAULT 1
         )
       `);
       // Defensive schema migration: upgrade TEXT to LONGTEXT to support large Base64 uploads
       await connection.query("ALTER TABLE cases MODIFY imageUrl LONGTEXT");
       await connection.query("ALTER TABLE cases MODIFY documentUrl LONGTEXT");
+      
+      // Defensive schema migration: add showProgress column if it doesn't exist
+      try {
+        await connection.query("ALTER TABLE cases ADD COLUMN showProgress TINYINT(1) DEFAULT 1");
+      } catch (err) {
+        // Safe to ignore if column already exists
+      }
       
       // Auto-create donations table
       await connection.query(`

@@ -636,7 +636,9 @@ function LiveCases() {
                         {expandedCases.includes(i) ? "Read Less" : "Read More"}
                       </button>
                     )}
-                    <DonationTrack raised={c.raisedAmount} goal={c.goalAmount} />
+                    {c.showProgress !== false && (
+                      <DonationTrack raised={c.raisedAmount} goal={c.goalAmount} />
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-3 mt-auto">
                     <a href={`/donate?case=${encodeURIComponent(c.title)}`} className="py-3.5 rounded-full text-white font-bold text-xs tracking-widest shadow-md hover:opacity-90 transition-opacity flex justify-center items-center" style={{ backgroundColor: "#E65A00", textDecoration: "none" }}>

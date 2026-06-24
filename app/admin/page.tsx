@@ -25,6 +25,7 @@ interface Case {
   documentName: string;
   createdAt: string;
   isActive: boolean;
+  showProgress?: boolean;
 }
 
 interface Donation {
@@ -67,7 +68,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
-  const [form, setForm] = useState({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "", raisedAmount: "" });
+  const [form, setForm] = useState({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "", raisedAmount: "", showProgress: "true" });
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null);
   const [editRaisedVal, setEditRaisedVal] = useState<string>("");
   const [editingCase, setEditingCase] = useState<Case | null>(null);
@@ -191,6 +192,7 @@ export default function AdminPage() {
       description: c.description || "",
       goalAmount: c.goalAmount ? c.goalAmount.toString() : "",
       raisedAmount: c.raisedAmount ? c.raisedAmount.toString() : "",
+      showProgress: c.showProgress !== false ? "true" : "false",
     });
     setCaseImageName(c.imageUrl ? "Current Image (Click to change)" : "");
     setCaseDocName(c.documentName || (c.documentUrl ? "Current Verification Doc" : ""));
@@ -198,7 +200,7 @@ export default function AdminPage() {
 
   function cancelEditCase() {
     setEditingCase(null);
-    setForm({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "", raisedAmount: "" });
+    setForm({ title: "", patientName: "", location: "", urgency: "high", description: "", goalAmount: "", raisedAmount: "", showProgress: "true" });
     setCaseImageName("");
     setCaseDocName("");
     if (imageRef.current) imageRef.current.value = "";
@@ -892,7 +894,7 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Urgency Level</label>
                         <select 
@@ -905,6 +907,20 @@ export default function AdminPage() {
                           <option value="low">🟢 Low Urgency</option>
                         </select>
                       </div>
+                      <div className="space-y-1">
+                        <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Fund Raised Meter</label>
+                        <select 
+                          value={form.showProgress} 
+                          onChange={e => setForm({ ...form, showProgress: e.target.value })} 
+                          className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 text-sm outline-none transition-all focus:border-[#FF6B00]"
+                        >
+                          <option value="true">🟢 Show Meter</option>
+                          <option value="false">🔴 Hide Meter</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="text-xs uppercase tracking-wider font-bold text-slate-500 ml-1">Goal Amount (₹)</label>
                         <input 
@@ -1057,11 +1073,18 @@ export default function AdminPage() {
                                   <h4 className="font-bold text-sm md:text-base text-slate-800 tracking-tight leading-tight line-clamp-1">
                                     {renderBoldText(c.title)}
                                   </h4>
-                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                                    c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"
-                                  }`}>
-                                    {c.isActive ? "LIVE" : "PAUSED"}
-                                  </span>
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                      c.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"
+                                    }`}>
+                                      {c.isActive ? "LIVE" : "PAUSED"}
+                                    </span>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                      c.showProgress !== false ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
+                                    }`}>
+                                      {c.showProgress !== false ? "METER ON" : "METER OFF"}
+                                    </span>
+                                  </div>
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-400">
